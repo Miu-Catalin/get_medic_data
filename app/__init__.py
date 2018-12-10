@@ -7,6 +7,8 @@ from app.export import export_date_medici
 
 
 url_root = ''
+token_auth = ''
+token_refresh = ''
 
 @click.command()
 @click.option('--api', default='http://localhost:5000/api/v2',  help="root url api\ndefault: http://localhost:5000/api/v2")
@@ -19,11 +21,25 @@ def app_run(api, tip, email, password):
     # for each get data daca nu are limita
     # write json fil
     url_root = api
-    token_auth, token_refresh = auth(url_root, email, password)
-    token_auth, lista_medic = get_lista_medic(url_root, token_auth, token_refresh)
-    date_medici = get_date_medici(url_root, token_auth, token_refresh, lista_medic)
+    auth(url_root, email, password)
+    lista_medic = get_lista_medic(url_root)
+    date_medici = get_date_medici(url_root, lista_medic)
     export_date_medici(tip, date_medici)
 
+def get_data_from_api(tip, url, data):
+    if tip == 'post':
+        try:
+            request = requests.post(url, json=data)
+        except requests.exceptions.HTTPError as exc:  # This is the correct syntax
+            print(exc)
+            sys.exit(1)
+    else:
+        try:
+            request = requests.get(url, headers=data)
+        except requests.exceptions.HTTPError as exc:  # This is the correct syntax
+            print(exc)
+            sys.exit(1)
+    return data
 
 def auth(url_root, email, password):
     url_auth = url_root + '/autentificare/login'
@@ -48,28 +64,34 @@ def auth(url_root, email, password):
         print(f'<red>** raspuns server:</red> {request.text}')
         sys.exit()
 
-    return token_access, token_refresh
+def set_headers(tip):
+    if tip == 'auth':
+        req_headers = {
+            'Authorization': f'Bearer {token_access}'
+        }
+    else:
+        req_headers = {
+            'Authorization': f'Bearer {token_refresh}'
+        }
+    return req_headers
 
 def auth_refresh_token(url_root, token_refresh):
     url = url_root + '/autentificare/refresh'
-    req_headers = {
-        'Authorization': f'Bearer {token_refresh}'
-    }
+    req_headers = set_headers('refresh')
     request = requests.post(url, headers=req_headers)
 
-    if request.status_code == 200:
-        print(f'<green>** raspuns server:</green> {request.json()["msg"]}')
-        return request.json()["access_token"]
-    print(f'<red>** raspuns server:</red> {request.json()["msg"]}')
-    sys.exit()
+    if request.status != 200:
+        print(f'<red>** raspuns s:erver:</red> {request.json()["msg"]}')
+        sys.exit()
 
-def get_lista_medic(url_root, token_access, token_refresh):
+    print(f'<green>** raspuns server:</green> {request.json()["msg"]}')
+    token_auth = request.json()["access_token"]
+
+def get_lista_medic(url_root):
     url = url_root + '/cmj/raport/lista_medic'
     lista_medic = []
 
-    req_headers = {
-        'Authorization': f'Bearer {token_access}'
-    }
+    req_headers = set_headers('auth')
     request = requests.get(url, headers=req_headers)
 
     if request.status_code == 404:
@@ -85,9 +107,9 @@ def get_lista_medic(url_root, token_access, token_refresh):
         lista_medic = request.json()['lista_medic']
         print(f'<green>** server.</green> get lista medici id <green>OK</green>')
         
-    return token_access, lista_medic
+    return lista_medic
 
-def get_date_medici(url_root, token_access, token_refresh, lista_medic):
+def get_date_medici(url_root, lista_medic):
     date_medici = []
     for id in enumerate(tqdm(lista_medic)):
         
