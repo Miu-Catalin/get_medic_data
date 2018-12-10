@@ -1,35 +1,41 @@
 # Exemplu script get medic data
 
-## Requirements
+## Utilizare
 
-python >= 3.6
+```bash
+python get_medic_data.py --api https://adresa_api --tip json --email user@domain.com
+```
+
+datele sunt exportate in folderul *./export*
+
+datele se pot exporta in format:
+- xlsx
+- csv
+- json
+
+pentru modificarea campurilor exportate in format xlsx si csv se editeaza fisierul app/export.py
 
 ## Instalare
 
 Instaleaza python venv
 
 ```bash
-python -m venv venv
+python3 -m venv venv
 ```
 
-Activeaza venv
-
+se activeaza venv
 linux
 
 ```bash
 source venv/bin/activate
 ```
+windows
+```bash
+C:\> .\venv\Scripts\activate.bat
+```
 
-Instaleaza dependinte
+se instaleaza python libraries
 
 ```bash
 pip install -r requirements.txt
 ```
-
-## Utilizare
-
-```bash
-python get_medic_data.py
-```
-
-verifica fisierul in folderul export
