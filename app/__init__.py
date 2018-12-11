@@ -9,7 +9,7 @@ from app.export import export_date_medici
 url_root = ''
 
 @click.command()
-@click.option('--api', default='http://localhost:5000/api/v2',  help="root url api\ndefault: http://localhost:5000/api/v2")
+@click.option('--api', default='http://localhost:5000',  help="root url api\ndefault: http://localhost:5000")
 @click.option('--tip', default='xlsx', help="tip fisier export\nOptiuni: json, csv, xlsx. \nDefault: xlsx")
 @click.option('--email', prompt='Email', help='adresa de email folosita pentru autentificare')
 @click.password_option(confirmation_prompt=False, help='parola folosita pentru autentificare')
@@ -18,7 +18,7 @@ def app_run(api, tip, email, password):
     # get lista cuim
     # for each get data daca nu are limita
     # write json fil
-    url_root = api
+    url_root = api + '/api/v2'
     token_auth, token_refresh = auth(url_root, email, password)
     token_auth, lista_medic = get_lista_medic(url_root, token_auth, token_refresh)
     date_medici = get_date_medici(url_root, token_auth, token_refresh, lista_medic)
