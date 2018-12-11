@@ -76,7 +76,7 @@ linux
 ```bash
 source venv/bin/activate
 ```
-windows
+sau windows
 ```bash
 C:\> .\venv\Scripts\activate.bat
 ```

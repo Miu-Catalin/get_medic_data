@@ -18,7 +18,7 @@ def app_run(api, tip, email, password):
     # get lista cuim
     # for each get data daca nu are limita
     # write json fil
-    url_root = api
+    url_root = api + '/api/v2'
     token_auth, token_refresh = auth(url_root, email, password)
     token_auth, lista_medic = get_lista_medic(url_root, token_auth, token_refresh)
     date_medici = get_date_medici(url_root, token_auth, token_refresh, lista_medic)
