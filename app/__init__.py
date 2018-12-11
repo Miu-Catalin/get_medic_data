@@ -35,7 +35,7 @@ def auth(url_root, email, password):
     
     try:
         request = requests.post(url_auth, json=data)
-    except requests.exceptions.HTTPError as exc:  # This is the correct syntax
+    except requests.exceptions.ConnectionError as exc:  # This is the correct syntax
         print(exc)
         sys.exit(1)
 
