@@ -1,7 +1,10 @@
+import os
 import sys
 import requests
 import click
+import json
 from tqdm import tqdm
+from datetime import date
 from ansimarkup import ansiprint as print
 from app.export import export_date_medici
 
@@ -20,6 +23,7 @@ def app_run(api, tip, email, password):
     # write json fil
     url_root = api + '/api/v2'
     token_auth, token_refresh = auth(url_root, email, password)
+    token_auth = get_registre(url_root, token_auth, token_refresh)
     token_auth, lista_medic = get_lista_medic(url_root, token_auth, token_refresh)
     date_medici = get_date_medici(url_root, token_auth, token_refresh, lista_medic)
     export_date_medici(tip, date_medici)
@@ -62,6 +66,33 @@ def auth_refresh_token(url_root, token_refresh):
         return request.json()["access_token"]
     print(f'<red>** raspuns server:</red> {request.json()["msg"]}')
     sys.exit()
+
+def get_registre(url_root, token_auth, token_refresh):
+    url = url_root + '/registre'
+
+    req_headers = {
+        'Authorization': f'Bearer {token_auth}'
+    }
+    request = requests.get(url, headers=req_headers)
+
+    nume_fisier = f"export/registre_{date.today()}.json"
+    os.makedirs(os.path.dirname(nume_fisier), exist_ok=True)
+    with open(nume_fisier, "w") as outfile:
+        json.dump(request.json(), outfile)
+    
+    if request.status_code == 404:
+        print(f'<red>** adresa api este incorecta</red> {request.url}')
+        sys.exit()
+    if request.status_code == 401:
+        print(f'<yellow>** token-ul de access a expirat</yellow>')
+        auth_token = auth_refresh_token(url_root, token_refresh)
+
+        request = requests.get(url, headers=req_headers)
+
+    if request.status_code == 200:
+        print(f'<green>** server.</green> get registre <green>OK</green>')
+    
+    return token_auth
 
 def get_lista_medic(url_root, token_access, token_refresh):
     url = url_root + '/cmj/raport/lista_medic'
