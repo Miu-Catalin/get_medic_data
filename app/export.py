@@ -11,9 +11,8 @@ def export_date_medici(tip, lista_date_medici):
     os.makedirs(os.path.dirname(nume_fisier), exist_ok=True)
 
     if tip == "json":
-        for medic in lista_date_medici:
-            with open(nume_fisier, "w") as outfile:
-                json.dump(medic, outfile)
+        with open(nume_fisier, "w") as outfile:
+            json.dump(lista_date_medici, outfile)
 
     if tip == "csv":
         with open(nume_fisier, "w", newline="") as csvfile:
