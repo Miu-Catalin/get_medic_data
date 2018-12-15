@@ -59,6 +59,11 @@ out.seek(0)
 
 ## Instalare
 
+```bash
+git clone https://github.com/Miu-Catalin/get_medic_data.git
+cd get_medic_data
+```
+
 Instaleaza python venv
 
 ```bash
@@ -71,7 +76,7 @@ linux
 ```bash
 source venv/bin/activate
 ```
-windows
+sau windows
 ```bash
 C:\> .\venv\Scripts\activate.bat
 ```
